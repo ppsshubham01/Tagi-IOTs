@@ -66,6 +66,8 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () async { await ApiService().getSensorData();
+                final snackBar = SnackBar(content: Text('Data Refressed!'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 print("object is Done!");
                 },
               icon: const Padding(
