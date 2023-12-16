@@ -59,25 +59,29 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.white,
         leading: const Icon(
           Icons.menu,
-          color: Colors.white,
         ),
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.refresh,
-                color: Colors.white,
+              onPressed: () async { await ApiService().getSensorData();
+                print("object is Done!");
+                },
+              icon: const Padding(
+                padding: EdgeInsets.only(right: 18.0),
+                child: Icon(
+                  Icons.refresh,
+                  color: Colors.blueAccent,
+                ),
               ))
         ],
         title: const Text(
-          "IOT Device Data",
-          style: TextStyle(color: Colors.white70),
+          "Device Data",
         ),
       ),
+
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -108,32 +112,29 @@ class _HomePageState extends State<HomePage> {
               //     )
               //   ],
               // ),
-              const SizedBox(
-                height: 20,
-              ),
-               Center(
-                  child: ElevatedButton(
-                      onPressed: () {
-                        print('NewestFirst button pressed!');
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0)),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.filter_alt),
-                          SizedBox(width: 8.0),
-                          Text('NewestFirst'),
-                        ],
-                      ))),
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     await ApiService().getSensorData();
-              //   },
-              //   child: const Text('click here'),
-              // ),
+
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.end,
+                 children: [
+                   SizedBox(
+                     width: 170,
+                     child: ElevatedButton(
+                         onPressed: () async {
+                           print('NewestFirst button pressed!');
+                         },
+                         style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),backgroundColor: Colors.white),
+                         child: const Row(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             Icon(Icons.arrow_drop_down,color: Color(0xFF7A7A7A),),
+                             SizedBox(width: 8.0),
+                             Text('Newest First',style: TextStyle(color: Color(0xFF7A7A7A)),),
+                           ],
+                         )
+                     ),
+                   ),
+                 ],
+               ),
               const SizedBox(
                 height: 30,
               ),
