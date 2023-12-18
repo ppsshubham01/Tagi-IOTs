@@ -10,25 +10,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   bool _isSwitched = false;
   List<Sensor> sensorDataList = [];
+  List<Sensor> sensorDataList2 = [];
+
   ///For loding more data
-  bool _isLoadingMore = false;
+  bool _isLoadMore = false;
+  bool _isNewest = false;
 
-  Future<void> _lodadMoreData() async{
-    if(_isLoadingMore)return;
-    _isLoadingMore=true;
-    await Future.delayed(const Duration(seconds: 2));
-    ///data.addAll
 
-    ///
-    _isLoadingMore= false;
+  void _loadMoreData() {
     setState(() {
-      // Notify the UI of data changes
+      _isLoadMore = !_isLoadMore;
     });
   }
-  initialisedSensorData() async {
+
+
+  void newestToOld() {
+    setState(() {
+    _isNewest = !_isNewest;
+    if(_isNewest){
+      sensorDataList.sort((a, b) => a.time1Data!.compareTo(b.time1Data.toString()));
+      sensorDataList2.sort((a, b) => a.time1Data!.compareTo(b.time1Data.toString()));
+
+    } else {
+      sensorDataList.sort((a, b) => b.time1Data!.compareTo(a.time1Data.toString()));
+      sensorDataList2.sort((a, b) => b.time1Data!.compareTo(a.time1Data.toString()));
+    }
+    });
+  }
+
+
+  void initialisedSensorData() async {
     final tempSensorDataList = await ApiService().getSensorData();
     tempSensorDataList.forEach((element) {
       Sensor tempSensorData = Sensor(
@@ -38,9 +51,11 @@ class _HomePageState extends State<HomePage> {
         sensor3Data: element['sensor3'],
         time1Data: element['time1'],
       );
+     // print(tempSensorData.time1Data);
       sensorDataList.add(tempSensorData);
     });
     setState(() {});
+    sensorDataList2 = List<Sensor>.from(sensorDataList.sublist(0, 9));
     print(sensorDataList);
   }
 
@@ -65,23 +80,25 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-              onPressed: () async {
-                await ApiService().getSensorData();
+              onPressed: () {
+                // await ApiService().getSensorData();
+                initialisedSensorData();
                 final snackBar = SnackBar(content: Text('Data Refressed!'));
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 print("object is Done!");
-                },
+              },
               icon: const Padding(
                 padding: EdgeInsets.only(right: 18.0),
-                child: Icon(Icons.refresh, color: Colors.blueAccent,),
+                child: Icon(
+                  Icons.refresh,
+                  color: Colors.blueAccent,
+                ),
               ))
         ],
         title: const Text(
           "Device Data",
         ),
       ),
-
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -113,28 +130,37 @@ class _HomePageState extends State<HomePage> {
               //   ],
               // ),
 
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.end,
-                 children: [
-                   SizedBox(
-                     width: 170,
-                     child: ElevatedButton(
-                         onPressed: () async {
-                           print('NewestFirst button pressed!');
-                         },
-                         style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),backgroundColor: Colors.white),
-                         child: const Row(
-                           mainAxisAlignment: MainAxisAlignment.center,
-                           children: [
-                             Icon(Icons.sort,color: Color(0xFF7A7A7A),),
-                             SizedBox(width: 8.0),
-                             Text('Newest First',style: TextStyle(color: Color(0xFF7A7A7A)),),
-                           ],
-                         )
-                     ),
-                   ),
-                 ],
-               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 170,
+                    child: ElevatedButton(
+                        onPressed: ()  {
+                          newestToOld();
+                          print('NewestFirst button pressed!');
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            backgroundColor: Colors.white),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                           const Icon(
+                              Icons.sort,
+                              color: Color(0xFF7A7A7A),
+                            ),
+                           const SizedBox(width: 8.0),
+                            Text(
+                              _isNewest ? 'Oldest First' : 'Newest First',
+                              style: TextStyle(color: Color(0xFF7A7A7A)),
+                            ),
+                          ],
+                        )),
+                  ),
+                ],
+              ),
               const SizedBox(
                 height: 30,
               ),
@@ -166,15 +192,36 @@ class _HomePageState extends State<HomePage> {
                       //     _isSortAsc = !_isSortAsc;
                       //   });
                       // }
-
                     ),
-
                     DataColumn(label: Text('Sensor 1')),
                     DataColumn(label: Text('Sensor 2')),
                     DataColumn(label: Text('Sensor 3')),
                     DataColumn(label: Text('TimeStamp')),
                   ],
-                  rows: sensorDataList.map((element) {
+                  rows: _isLoadMore ? sensorDataList.map((element) {
+                    return DataRow(selected: true, cells: [
+                      DataCell(
+                        Text(element.srNo),
+                        showEditIcon: true, // placeholder: true
+                      ),
+                      DataCell(Align(
+                        alignment: Alignment.center,
+                        child: Text(element.sensor1Data.toString()),
+                      )),
+                      DataCell(Align(
+                        alignment: Alignment.center,
+                        child: Text(element.sensor2Data.toString()),
+                      )),
+                      DataCell(Align(
+                        alignment: Alignment.center,
+                        child: Text(element.sensor3Data.toString()),
+                      )),
+                      DataCell(Align(
+                        alignment: Alignment.center,
+                        child: Text(element.time1Data.toString()),
+                      )),
+                    ]);
+                  }).toList() : sensorDataList2.map((element) {
                     return DataRow(selected: true, cells: [
                       DataCell(
                         Text(element.srNo),
@@ -199,7 +246,13 @@ class _HomePageState extends State<HomePage> {
                     ]);
                   }).toList(),
                 ),
-              )
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _loadMoreData();
+                },
+                child: Text(_isLoadMore ? 'Load Less' : 'Load More'),
+              ),
             ],
           ),
         ),
@@ -207,10 +260,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _addMoreData() {
-    // Simulating addition of more data
-    sensorDataList.addAll([
-
-    ]);
-  }
 }
