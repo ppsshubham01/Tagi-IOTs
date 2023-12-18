@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _lodadMoreData() async{
     if(_isLoadingMore)return;
     _isLoadingMore=true;
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     ///data.addAll
 
     ///
@@ -65,17 +65,15 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-              onPressed: () async { await ApiService().getSensorData();
+              onPressed: () async {
+                await ApiService().getSensorData();
                 final snackBar = SnackBar(content: Text('Data Refressed!'));
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 print("object is Done!");
                 },
               icon: const Padding(
                 padding: EdgeInsets.only(right: 18.0),
-                child: Icon(
-                  Icons.refresh,
-                  color: Colors.blueAccent,
-                ),
+                child: Icon(Icons.refresh, color: Colors.blueAccent,),
               ))
         ],
         title: const Text(
@@ -128,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                          child: const Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Icon(Icons.arrow_drop_down,color: Color(0xFF7A7A7A),),
+                             Icon(Icons.sort,color: Color(0xFF7A7A7A),),
                              SizedBox(width: 8.0),
                              Text('Newest First',style: TextStyle(color: Color(0xFF7A7A7A)),),
                            ],
